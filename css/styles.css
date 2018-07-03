@@ -1,0 +1,67 @@
+.lzl-panel-view-messages {
+    margin: 15px 15px !important;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 10px !important;
+    text-align: left;
+    font-style: italic;
+    position: relative;
+}
+.lzl-panel-view-messages.error {
+    color: #aa0000;
+    border-left-width: 1px;
+}
+.lzl-panel-view-messages.success {
+    color: #00aa00;
+    border-left-width: 1px;
+}
+.lzl-panel-view-messages .cl {
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    cursor: pointer;
+}
+.lzl-panel-view-messages .cl {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+#panel-view-codes-added {
+    margin: 0;
+    padding: 0;
+    max-height: 300px;
+    overflow: auto;
+}
+#panel-view-codes-added li {
+    position: relative;
+    list-style-type: none;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+#panel-view-codes-added li b {
+    font-size: 25px;
+    line-height: 25px;
+}
+
+.wrap-table-codes-results {
+    overflow: auto;
+    max-height: 450px;
+}
+table.codes-results {
+    border-spacing: 0;
+}
+/*
+table.codes-results tr {
+    
+}*/
+table.codes-results th,
+table.codes-results td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 15px;
+    text-align: center;
+}
