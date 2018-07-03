@@ -27,7 +27,7 @@ class LZL_Product_Codes {
         add_action( 'save_post', array($this,'saveCodes') );
 
         add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
-        add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 2);
+        add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 3);
         add_filter( 'list_products_home', array($this,'filterListProductsHome'), 10);
         //add_action( 'phpmailer_init', array($this,'mailFilter'), 18, 1);
 
@@ -44,16 +44,17 @@ class LZL_Product_Codes {
         return $new_list;
     }
 
-    public function filterDataReportProduct($str_p,$data_product) {
-        $product_id = $data_product['product_id'];
-        $list_codes = self::getCodesProduct($product_id);
+    public function filterDataReportProduct($str_p,$product_id,$order) {
+        $data_order = $order->get_data();
+
+        global $wpdb;
+        $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
+        $list_codes = $wpdb->get_results( sprintf('SELECT * FROM '.$table_name.' WHERE post_id = %d AND user_email = "%s";', $product_id,$data_order['billing']['email']) );
 
         $list = [];
         foreach($list_codes as $item) {
-            if( $item->user_email ) {
-                $list[] = sprintf(__('%s asociate to %s','lzl-product-codes'), $item->code, $item->user_email);
-            }
-         }
+            $list[] = $item->code;
+        }
 
         if( empty($list) ) {
             return $str_p;
@@ -74,7 +75,7 @@ class LZL_Product_Codes {
         foreach($items as $product) {
             $product_id = $product->get_product_id();
 
-            $list_codes = self::getCodesProduct($product_id);
+            $list_codes = self::getCodesProductAvailable($product_id);
 
             if( empty($list_codes) ) {
                 continue;
@@ -88,17 +89,16 @@ class LZL_Product_Codes {
             }
             
             $html_codes = [];
-            foreach ($list_codes as $item) {
-                if( !$item->user_email ) {
-                    $html_codes[] = $item->code;
-                }
+            foreach($list_codes as $item) {
+                $html_codes[] = $item->code;
+                break;
             }
 
             if( empty($html_codes) ) {
                 continue;
             }
 
-            $message = str_replace(['{email}','{codes}'],[$to,'<ul><li>'.implode('</li><li>',$html_codes).'</li></ul>'],$message);
+            $message = str_replace(['{email}','{code}'],[$to,'<ul><li>'.implode('</li><li>',$html_codes).'</li></ul>'],$message);
 
             if( !self::sendMail($to, $subject, $message) ) {
                 self::sendMail(get_option('admin_email'), 'ERROR: '.$subject, $message);

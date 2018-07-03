@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LzL Product Codes\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-03 05:12+0000\n"
-"PO-Revision-Date: 2018-07-03 05:13+0000\n"
+"POT-Creation-Date: 2018-07-03 06:30+0000\n"
+"PO-Revision-Date: 2018-07-03 06:30+0000\n"
 "Last-Translator: admin <testmlzra@gmail.com>\n"
 "Language-Team: Español\n"
 "Language: es_ES\n"
@@ -13,115 +13,110 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/"
 
-#: lrep-product-codes.php:52
-#, php-format
-msgid "%s asociate to %s"
-msgstr "%s vendido a %s"
-
-#: lrep-product-codes.php:60
+#: lrep-product-codes.php:63
 msgid "List Codes:"
 msgstr "Lista de Códigos:"
 
-#: lrep-product-codes.php:168
+#: lrep-product-codes.php:170
 msgid "Available"
 msgstr "Disponible"
 
-#: lrep-product-codes.php:171
+#: lrep-product-codes.php:173
 #, php-format
 msgid "Assign to %s"
 msgstr "Asignado a %s"
 
-#: lrep-product-codes.php:173
+#: lrep-product-codes.php:175
 msgid "Assign"
 msgstr "Asignado"
 
-#: lrep-product-codes.php:175
+#: lrep-product-codes.php:177
 msgid "Used"
 msgstr "Usado"
 
-#: lrep-product-codes.php:177
+#: lrep-product-codes.php:179
 msgid "Pending"
 msgstr "Pendiente"
 
-#: lrep-product-codes.php:179
+#: lrep-product-codes.php:181
 #, php-format
 msgid "Status is invalid: %s"
 msgstr "El estado es inválido: %s"
 
-#: lrep-product-codes.php:199 lrep-product-codes.php:252
+#: lrep-product-codes.php:201 lrep-product-codes.php:254
 msgid "Product ID is empty"
 msgstr "El ID del producto es vacío"
 
-#: lrep-product-codes.php:203
+#: lrep-product-codes.php:205
 msgid "Invalid email"
 msgstr "Email inválido"
 
-#: lrep-product-codes.php:216
+#: lrep-product-codes.php:218
 msgid "The Subject email is empty"
 msgstr "El Asunto del email es vacío"
 
-#: lrep-product-codes.php:220
+#: lrep-product-codes.php:222
 msgid "The Body Message email is empty"
 msgstr "El cuerpo de mensaje del email es vacío"
 
-#: lrep-product-codes.php:226 lrep-product-codes.php:244
+#: lrep-product-codes.php:228 lrep-product-codes.php:246
 msgid "Error sending the email try again later"
 msgstr "Error enviando el email. Intente nuevamente más tarde"
 
-#: lrep-product-codes.php:247
+#: lrep-product-codes.php:249
 msgid "Email was sended"
 msgstr "El email fue enviado"
 
-#: lrep-product-codes.php:264 lrep-product-codes.php:391
-#: lrep-product-codes.php:392
+#: lrep-product-codes.php:266 lrep-product-codes.php:393
+#: lrep-product-codes.php:394
 msgid "Code"
 msgstr "Código"
 
-#: lrep-product-codes.php:265
+#: lrep-product-codes.php:267
 msgid "Status"
 msgstr "Estado"
 
-#: lrep-product-codes.php:290
+#: lrep-product-codes.php:292
 msgid "Codes not found to this product."
 msgstr "Este producto no tiene códigos."
 
-#: lrep-product-codes.php:337
+#: lrep-product-codes.php:339
 msgid "Code is empty"
 msgstr "El Código es vacío"
 
-#: lrep-product-codes.php:341 lrep-product-codes.php:393
+#: lrep-product-codes.php:343 lrep-product-codes.php:395
 msgid "Code exists"
 msgstr "El Código ya existe."
 
-#: lrep-product-codes.php:344
+#: lrep-product-codes.php:346
 msgid "Code not found"
 msgstr "No se encontro el Código"
 
-#: lrep-product-codes.php:350
+#: lrep-product-codes.php:352
 msgid "Options Codes"
 msgstr "Códigos del Producto"
 
-#: lrep-product-codes.php:378
+#: lrep-product-codes.php:380
 msgid "See codes"
 msgstr "Ver los códigos"
 
-#: lrep-product-codes.php:381
+#: lrep-product-codes.php:383
 msgid "Subject email"
 msgstr "Asunto del email"
 
-#: lrep-product-codes.php:385
+#: lrep-product-codes.php:387
 msgid "Body Message email"
 msgstr "Cuerpo del mensaje del email"
 
-#: lrep-product-codes.php:393
+#: lrep-product-codes.php:395
 msgid "Code value is empty"
 msgstr "El valor del código es vacío"
 
-#: lrep-product-codes.php:393
+#: lrep-product-codes.php:395
 msgid "Add code"
 msgstr "Agregar código"
 
-#: lrep-product-codes.php:450
+#: lrep-product-codes.php:452
 msgid "WooCommerce plugin is required"
 msgstr "Debes instalar y activar el plugin WooCommercer primeramente."
 
