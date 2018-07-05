@@ -113,6 +113,38 @@ Object.defineProperty(window, 'mlzl_admin_alert', {
 Object.defineProperty(window, 'lzlAttachEventSend', {
     get: function() { 
         return function() {
+			
+			jQuery('.lzl-btn-delete-code').on('click',function(e){
+				e.preventDefault();
+				var _this = jQuery(this);
+
+				if( _this.hasClass('deleting') ) {
+					return;
+				}
+				jQuery('#lzl-modal-messages').hide();
+				_this.addClass('deleting').attr('disabled',true);
+
+				var c = _this.data('code');
+
+				jQuery.ajax({
+					url: ajaxurl,
+					type: 'post',
+					dataType: 'json',
+					data: {
+						action: 'lzldemailu1',
+						code: c,
+					}
+				}).done(function(result){
+					_this.removeClass('deleting').attr('disabled',false);
+					
+					if( result.success ) {
+						_this.parent().parent().remove();
+						return;
+					}
+					lzlCodesShowMessage('error',result.data,'lzl-modal-messages');
+				}).fail(lzlExecFail);
+
+			});
 			jQuery('.lzl-btn-send-email').on('click',function(e){
 				e.preventDefault();
 				var _this = jQuery(this);
@@ -153,12 +185,27 @@ Object.defineProperty(window, 'lzlAttachEventSend', {
     }
 });
 
+var lzl_listing_codes_added = [];
 
 jQuery(document).ready(function(){
 
-	
-
-	
+	var attachEventRemoveCode = function() {
+		jQuery('.rv-item-code-lzl').off('click').on('click',function(e){
+			e.preventDefault();
+			var _this = jQuery(this);
+			var _code = _this.data('code');
+			console.log(_code);
+			console.log(lzl_listing_codes_added);
+			for(var i = 0; i < lzl_listing_codes_added.length; i++) {
+				if(_code == lzl_listing_codes_added[i]) {
+					delete(lzl_listing_codes_added[i]);
+				}
+			}
+			console.log(lzl_listing_codes_added);
+			//lzl_listing_codes_added = lzl_listing_codes_added.splice(""+_code);
+			_this.parent().remove();
+		});
+	};
 
 	var btnAddCodes = document.getElementById('btn-add-form-codes');
 	if( btnAddCodes ) {
@@ -166,11 +213,6 @@ jQuery(document).ready(function(){
 			e.preventDefault();
 
 			var _this = jQuery(this);
-			var listing = _this.data('listing');
-
-			if( !jQuery.isArray(listing) ) {
-				listing = [];
-			}
 
 			jQuery('#panel-view-codes-messages').hide();
 
@@ -181,22 +223,20 @@ jQuery(document).ready(function(){
 				return;
 			}
 
-			if( jQuery.inArray(code,listing) != -1 ) {
-				lzlCodesShowMessage('error',_this.data('msg-code-exists'));
-				return;
-			}
-
-			var addCode = function() {
+			var addCode = function(new_code) {
+				if( jQuery.inArray(new_code,lzl_listing_codes_added) != -1 ) {
+					lzlCodesShowMessage('error',_this.data('msg-code-exists'));
+					return;
+				}
 				var html_code = '<li>'+
-					'<b>'+code+'</b>'+
-					'<input type="hidden" name="lzl_codes[]" value="'+code+'" />'+
-					'<b class="cl dashicons dashicons-dismiss" onclick="jQuery(this).parent().remove();var l = jQuery(document.getElementById(\'btn-add-form-codes\')).data(\'listing\');jQuery(document.getElementById(\'btn-add-form-codes\')).data(\'listing\',l.splice(\''+code+'\'));"></b>'+
+					'<b>'+new_code+'</b>'+
+					'<input type="hidden" name="lzl_codes[]" value="'+new_code+'" />'+
+					'<b class="cl rv-item-code-lzl dashicons dashicons-dismiss" data-code="'+new_code+'"></b>'+
 					'</li>';
 
 				jQuery('#panel-view-codes-added').prepend(html_code);
-				listing.push(code);
-				_this.data('listing',listing);
-				
+				lzl_listing_codes_added.push(new_code);
+				attachEventRemoveCode();
 			};
 
 			if( _this.hasClass('checking') ) {
@@ -214,7 +254,7 @@ jQuery(document).ready(function(){
 			}).done(function(result){
 				_this.removeClass('checking').attr('disabled',false);
 				if( result.success ) {
-					addCode();
+					addCode(result.data);
 					return;
 				}
 				lzlCodesShowMessage('error',result.data);

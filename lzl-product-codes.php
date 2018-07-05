@@ -23,11 +23,15 @@ class LZL_Product_Codes {
         add_action( 'wp_ajax_lzlapcode2', array($this,'ajaxCheckIfExists') );
         add_action( 'wp_ajax_lzlspcode7', array($this,'ajaxGetHtmlCodesProduct') );
         add_action( 'wp_ajax_lzlsemailu5', array($this,'ajaxSendCodeEmail') );
+        add_action( 'wp_ajax_lzldemailu1', array($this,'ajaxDeleteCodeEmail') );
+        
         
         add_action( 'save_post', array($this,'saveCodes') );
 
-        add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
-        add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 3);
+        //add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
+        add_action( 'woocommerce_email_customer_details', array($this,'contentEmailProcessing'), 19, 4);
+
+        //add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 3);
         add_filter( 'list_products_home', array($this,'filterListProductsHome'), 10);
         //add_action( 'phpmailer_init', array($this,'mailFilter'), 18, 1);
 
@@ -61,6 +65,76 @@ class LZL_Product_Codes {
         }
 
         return $str_p."\n".__('List Codes:','lzl-product-codes')."\n".implode("\n",$list)."\n-----------";
+    }
+
+    public static function getCodesByProductEmail($product_id,$email) {
+
+        global $wpdb;
+        $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
+        $list_codes = $wpdb->get_results( sprintf('SELECT * FROM '.$table_name.' WHERE post_id = %d AND user_email = "%s";', $product_id,$email) );
+
+        $list = [];
+        foreach($list_codes as $item) {
+            $list[] = $item->code;
+        }
+
+        return $list;
+    }
+
+    public function contentEmailProcessing($order, $sent_to_admin, $plain_text, $email) {
+        $items = $order->get_items();
+
+        global $wpdb;
+        $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
+
+        $to = $email->get_recipient();
+        
+        $product = reset($items);
+        $product_id = $product->get_product_id();
+
+        $list_codes = self::getCodesProductAvailable($product_id);
+
+        if( empty($list_codes) ) {
+            return;
+        }
+
+        $subject = get_post_meta($product_id,'lzl_custom_subject_codes',true);
+        $message = get_post_meta($product_id,'lzl_custom_message_codes',true);
+
+        if( empty($subject) || empty($message) ) {
+            return;
+        }
+        
+        $html_codes = [];
+        foreach($list_codes as $item) {
+            $html_codes[] = $item->code;
+            break;
+        }
+
+        if( empty($html_codes) ) {
+            return;
+        }
+        
+        $message = str_replace(['{email}','{code}'],[$to,'<ul><li>'.implode('</li><li>',$html_codes).'</li></ul>'],$message);
+
+        foreach($html_codes as $code) {
+            
+            $updated = $wpdb->update( 
+                $table_name, 
+                array( 
+                    'user_email' => $to,
+                    'status' => 1,
+                ), 
+                array( 'code' => $code ), 
+                array( 
+                    '%s',
+                    '%d',
+                ), 
+                array( '%s' ) 
+            );
+        }
+
+        echo '<hr/><h3 style="font-size: 18px;line-height: 22px;">'.$subject.'</h3>'.$message.'<hr/><br/>';
     }
 
     public function responsePayment($order,$request) {
@@ -195,6 +269,24 @@ class LZL_Product_Codes {
         return $wpdb->get_results( sprintf('SELECT * FROM '.$table_name.' WHERE post_id = %d AND status = "0";', $product_id) );
     }
 
+    public function ajaxDeleteCodeEmail() {
+        if( empty($_POST['code']) ) {
+            wp_send_json_error( __('Code value is empty','lzl-product-codes') );
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
+
+        $code = trim( $_POST['code'] );
+        
+        $deleted = $wpdb->delete( $table_name, array( 'code' => $code ), array( '%s' ) );
+
+        if( $deleted === false ) {
+            wp_send_json_error( __('Error deleting the code try again later','lzl-product-codes') );
+        }
+
+        wp_send_json_success( __('Code was sended','lzl-product-codes') );
+    }
     public function ajaxSendCodeEmail() {
         
         if( empty($_POST['product']) ) {
@@ -273,12 +365,9 @@ class LZL_Product_Codes {
                             <td><?php echo $item->code; ?></td>
                             <td><?php
                             echo LZL_Product_Codes::statusMean( $item );
-                            /*if( $item->status == 0 ) { ?>
-                            <hr/>
-                            <input type="email" name="lzl_sendeto<?php echo $item->code; ?>"  />
-                            <a class="lzl-btn-send-email button button-secondary" href="#" data-code="<?php echo $item->code; ?>" data-product="<?php echo $item->post_id; ?>"><?php _e('Send','lzl-product-codes'); ?></a>
-                            <hr/>
-                            <?php }*/
+                            if( $item->status == 0 ) { ?>
+                            <a class="lzl-btn-delete-code button button-secondary" href="#" data-code="<?php echo $item->code; ?>"><?php _e('Delete','lzl-product-codes'); ?></a>
+                            <?php }
                             ?></td>
                         </tr>
                     <?php } ?>
@@ -338,12 +427,12 @@ class LZL_Product_Codes {
         if( empty($_POST['code']) ) {
             wp_send_json_error( __('Code is empty','lzl-product-codes') );
         }
-        $code = $_POST['code'];
+        $code = sanitize_title( trim($_POST['code']) );
         if( $this->exists( $code ) ) {
             wp_send_json_error( __('Code exists','lzl-product-codes') );
         }
 
-        wp_send_json_success( __('Code not found','lzl-product-codes') );
+        wp_send_json_success( $code );
     }
 
 
