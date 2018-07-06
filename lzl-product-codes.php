@@ -28,7 +28,7 @@ class LZL_Product_Codes {
         
         add_action( 'save_post', array($this,'saveCodes') );
 
-        //add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
+        add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
         add_action( 'woocommerce_email_customer_details', array($this,'contentEmailProcessing'), 19, 4);
 
         //add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 3);
@@ -67,11 +67,11 @@ class LZL_Product_Codes {
         return $str_p."\n".__('List Codes:','lzl-product-codes')."\n".implode("\n",$list)."\n-----------";
     }
 
-    public static function getCodesByProductEmail($product_id,$email) {
+    public static function getCodesByProductEmailOrder($product_id,$email,$order_id) {
 
         global $wpdb;
         $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
-        $list_codes = $wpdb->get_results( sprintf('SELECT * FROM '.$table_name.' WHERE post_id = %d AND user_email = "%s";', $product_id,$email) );
+        $list_codes = $wpdb->get_results( sprintf('SELECT * FROM '.$table_name.' WHERE post_id = %d AND user_email = "%s" AND order_id = %d;', $product_id,$email,$order_id) );
 
         $list = [];
         foreach($list_codes as $item) {
@@ -87,9 +87,9 @@ class LZL_Product_Codes {
         global $wpdb;
         $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
 
-        $to = $email->get_recipient();
+        $to = $order->get_data()['billing']['email'];
         
-        $product = reset($items);
+        $product = reset($items);//Only first product
         $product_id = $product->get_product_id();
 
         $list_codes = self::getCodesProductAvailable($product_id);
@@ -117,23 +117,6 @@ class LZL_Product_Codes {
         
         $message = str_replace(['{email}','{code}'],[$to,'<ul><li>'.implode('</li><li>',$html_codes).'</li></ul>'],$message);
 
-        foreach($html_codes as $code) {
-            
-            $updated = $wpdb->update( 
-                $table_name, 
-                array( 
-                    'user_email' => $to,
-                    'status' => 1,
-                ), 
-                array( 'code' => $code ), 
-                array( 
-                    '%s',
-                    '%d',
-                ), 
-                array( '%s' ) 
-            );
-        }
-
         echo '<hr/><h3 style="font-size: 18px;line-height: 22px;">'.$subject.'</h3>'.$message.'<hr/><br/>';
     }
 
@@ -144,56 +127,30 @@ class LZL_Product_Codes {
         global $wpdb;
         $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
 
-        $to = $order->get_data()['billing']['email'];
+        $product = reset( $items );//Only first product
+        $product_id = $product->get_product_id();
 
-        foreach($items as $product) {
-            $product_id = $product->get_product_id();
+        $list_codes = self::getCodesProductAvailable($product_id);
 
-            $list_codes = self::getCodesProductAvailable($product_id);
-
-            if( empty($list_codes) ) {
-                continue;
-            }
-
-            $subject = get_post_meta($product_id,'lzl_custom_subject_codes',true);
-            $message = get_post_meta($product_id,'lzl_custom_message_codes',true);
-
-            if( empty($subject) || empty($message) ) {
-                continue;
-            }
-            
-            $html_codes = [];
-            foreach($list_codes as $item) {
-                $html_codes[] = $item->code;
-                break;
-            }
-
-            if( empty($html_codes) ) {
-                continue;
-            }
-
-            $message = str_replace(['{email}','{code}'],[$to,'<ul><li>'.implode('</li><li>',$html_codes).'</li></ul>'],$message);
-
-            if( !self::sendMail($to, $subject, $message) ) {
-                self::sendMail(get_option('admin_email'), 'ERROR: '.$subject, $message);
-            }
-            foreach($html_codes as $code) {
-                
-                $updated = $wpdb->update( 
-                    $table_name, 
-                    array( 
-                        'user_email' => $to,
-                        'status' => 1,
-                    ), 
-                    array( 'code' => $code ), 
-                    array( 
-                        '%s',
-                        '%d',
-                    ), 
-                    array( '%s' ) 
-                );
-            }
+        if( empty($list_codes) ) {
+            return;
         }
+        
+        $item = reset( $list_codes );//Only to mark use first code
+        $updated = $wpdb->update( 
+            $table_name, 
+            array( 
+                'user_email' => $order->get_data()['billing']['email'],
+                'status' => 1,
+                'order_id' => $order->get_id(),
+            ), 
+            array( 'code' => $item->code ), 
+            array( 
+                '%s',
+                '%d',
+            ), 
+            array( '%s' ) 
+        );
 
     }
 
@@ -279,7 +236,7 @@ class LZL_Product_Codes {
 
         $code = trim( $_POST['code'] );
         
-        $deleted = $wpdb->delete( $table_name, array( 'code' => $code ), array( '%s' ) );
+        $deleted = $wpdb->delete( $table_name, array( 'code' => $code,'status' => 0, ), array( '%s', '%d' ) );
 
         if( $deleted === false ) {
             wp_send_json_error( __('Error deleting the code try again later','lzl-product-codes') );
@@ -427,7 +384,12 @@ class LZL_Product_Codes {
         if( empty($_POST['code']) ) {
             wp_send_json_error( __('Code is empty','lzl-product-codes') );
         }
-        $code = sanitize_title( trim($_POST['code']) );
+        $code = trim($_POST['code']);
+
+        if( !preg_match('/^([0-9]|[a-zA-Z])+$/',$code) ) {
+            wp_send_json_error( __('Code is invalid. Type only letters or numbers.','lzl-product-codes') );
+        }
+        
         if( $this->exists( $code ) ) {
             wp_send_json_error( __('Code exists','lzl-product-codes') );
         }
@@ -518,10 +480,12 @@ function lzl_product_codes_install() {
             `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT, 
             `code` varchar(255) NOT NULL UNIQUE,
             `post_id` bigint(20) unsigned NOT NULL,
+            `order_id` bigint(20) unsigned,
             `user_email` varchar(100),
             `status` char(1) DEFAULT '0' comment \"0=available, 1=assign, 2=used, 3=pending\",
             CONSTRAINT Pk_$table_name PRIMARY KEY (`id`),
-            CONSTRAINT Fk_posts FOREIGN KEY (`post_id`) REFERENCES {$wpdb->prefix}posts(ID)
+            CONSTRAINT Fk_posts FOREIGN KEY (`post_id`) REFERENCES {$wpdb->prefix}posts(ID),
+            CONSTRAINT Fk_orders FOREIGN KEY (`post_id`) REFERENCES {$wpdb->prefix}posts(ID)
         );";
 
     
