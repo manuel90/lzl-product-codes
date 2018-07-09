@@ -182,9 +182,14 @@ class LZL_Product_Codes {
             array( 
                 '%s',
                 '%d',
+                '%d',
             ), 
             array( '%s' ) 
         );
+
+        if( !($updated === false) ) {
+            do_action( 'lzl_updated_code_status', $order, $item->code );
+        }
 
     }
 
@@ -387,10 +392,10 @@ class LZL_Product_Codes {
 
             $values = [];
             foreach($_POST['lzl_codes'] as $code) {
-                if( $this->exists( $code ) ) {
+                if( $this->exists( $code ) || !preg_match('/^([0-9]|[a-zA-Z])+$/',$code) ) {
                     continue;
                 }
-                $values[] = sprintf('(%d,%s)',$post_id,$code);
+                $values[] = sprintf('(%d,"%s")',$post_id,$code);
             }
 
             $table_name = $wpdb->prefix.LZL_PRODUCT_CODES_TBL_NAME;
