@@ -189,6 +189,20 @@ var lzl_listing_codes_added = [];
 
 jQuery(document).ready(function(){
 
+	var enabledCodes = document.getElementById('lzl_enabled_products_codes');
+	if( enabledCodes ) {
+
+		jQuery(enabledCodes).on('change',function() {
+			var _this = jQuery(this);
+			if( _this.attr('checked') ) {
+				jQuery('.show_if_enabled_products').show();
+			} else {
+				jQuery('.show_if_enabled_products').hide();
+			}
+		});
+		jQuery(enabledCodes).trigger('change');
+	}
+
 	var attachEventRemoveCode = function() {
 		jQuery('.rv-item-code-lzl').off('click').on('click',function(e){
 			e.preventDefault();

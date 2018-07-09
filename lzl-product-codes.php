@@ -35,13 +35,34 @@ class LZL_Product_Codes {
         add_filter( 'list_products_home', array($this,'filterListProductsHome'), 10);
         //add_action( 'phpmailer_init', array($this,'mailFilter'), 18, 1);
 
+        add_filter( 'product_type_options', array($this,'enableCodesCheckbox') );
+
         load_plugin_textdomain( 'lzl-product-codes', false, basename( dirname( __FILE__ ) ) . '/languages' );
+    }
+
+    public function enableCodesCheckbox($checks) {
+        global $post;
+        $enabled_codes = get_post_meta($post->ID,'lzl_enabled_products_codes',true);
+        
+        if( empty($enabled_codes) ) {
+            $enabled_codes = 'no';
+        }
+
+        $checks['lzl_enabled_codes'] = array(
+            'id'            => 'lzl_enabled_products_codes',
+            'wrapper_class' => '',
+            'label'         => __('Enable codes', 'lzl-product-codes'),
+            'description'   => __('Allow add code to product.', 'lzl-product-codes'),
+            'default'       => $enabled_codes,
+        );
+        return $checks;
     }
 
     public function filterListProductsHome($products) {
         $new_list = [];
         foreach($products as $key=>$p) {
-            if( count( self::getCodesProductAvailable($p->ID) ) > 0 ) {
+            $enabled_code = get_post_meta($p->ID,'lzl_enabled_products_codes',true);
+            if( $enabled_code != 'yes' || count( self::getCodesProductAvailable($p->ID) ) > 0 ) {
                 $new_list[] = $p;
             }
         }
@@ -92,6 +113,13 @@ class LZL_Product_Codes {
         $product = reset($items);//Only first product
         $product_id = $product->get_product_id();
 
+        
+        $enabled_codes = get_post_meta($product_id,'lzl_enabled_products_codes',true);
+
+        if( $enabled_codes != 'yes' ) {
+            return;
+        }
+
         $list_codes = self::getCodesProductAvailable($product_id);
 
         if( empty($list_codes) ) {
@@ -129,6 +157,12 @@ class LZL_Product_Codes {
 
         $product = reset( $items );//Only first product
         $product_id = $product->get_product_id();
+
+        $enabled_codes = get_post_meta($product_id,'lzl_enabled_products_codes',true);
+
+        if( $enabled_codes != 'yes' ) {
+            return;
+        }
 
         $list_codes = self::getCodesProductAvailable($product_id);
 
@@ -363,6 +397,8 @@ class LZL_Product_Codes {
             $r = $wpdb->query('INSERT INTO '.$table_name.'(post_id,code) VALUES '.implode(',', $values).';');
         }
 
+        update_post_meta($post_id,'lzl_enabled_products_codes', isset($_POST['lzl_enabled_products_codes']) ? 'yes' : 'no');
+
         if ( !empty($_POST['lzl_body_message_codes']) ) {
             update_post_meta($post_id,'lzl_custom_message_codes', trim($_POST['lzl_body_message_codes']));
         }
@@ -402,7 +438,7 @@ class LZL_Product_Codes {
         $tabs['option_codes_lzl'] = array(
             'label' => __('Options Codes','lzl-product-codes'),
             'target' => 'lzl_tab_product_codes',
-            'class' => [''],
+            'class' => ['show_if_enabled_products'],
             'priority' => 90
         );
         return $tabs; 

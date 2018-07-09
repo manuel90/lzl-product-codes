@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LzL Product Codes\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-05 06:23+0000\n"
-"PO-Revision-Date: 2018-07-05 06:24+0000\n"
+"POT-Creation-Date: 2018-07-09 00:02+0000\n"
+"PO-Revision-Date: 2018-07-09 00:05+0000\n"
 "Last-Translator: admin <testmlzra@gmail.com>\n"
 "Language-Team: Español\n"
 "Language: es_ES\n"
@@ -13,118 +13,130 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/"
 
-#: lrep-product-codes.php:67
+#: lzl-product-codes.php:54
+msgid "Enable codes"
+msgstr "Habilitar Uso de Códigos"
+
+#: lzl-product-codes.php:55
+msgid "Allow add code to product."
+msgstr "Permite agregar códigos al producto."
+
+#: lzl-product-codes.php:88
 msgid "List Codes:"
 msgstr "Lista de Códigos:"
 
-#: lrep-product-codes.php:244
+#: lzl-product-codes.php:235
 msgid "Available"
 msgstr "Disponible"
 
-#: lrep-product-codes.php:247
+#: lzl-product-codes.php:238
 #, php-format
 msgid "Assign to %s"
 msgstr "Asignado a %s"
 
-#: lrep-product-codes.php:249
+#: lzl-product-codes.php:240
 msgid "Assign"
 msgstr "Asignado"
 
-#: lrep-product-codes.php:251
+#: lzl-product-codes.php:242
 msgid "Used"
 msgstr "Usado"
 
-#: lrep-product-codes.php:253
+#: lzl-product-codes.php:244
 msgid "Pending"
 msgstr "Pendiente"
 
-#: lrep-product-codes.php:255
+#: lzl-product-codes.php:246
 #, php-format
 msgid "Status is invalid: %s"
 msgstr "El estado es inválido: %s"
 
-#: lrep-product-codes.php:274 lrep-product-codes.php:484
+#: lzl-product-codes.php:265 lzl-product-codes.php:482
 msgid "Code value is empty"
 msgstr "El valor del código es vacío"
 
-#: lrep-product-codes.php:285
+#: lzl-product-codes.php:276
 msgid "Error deleting the code try again later"
 msgstr "Error eliminando el código, intente más tarde."
 
-#: lrep-product-codes.php:288
+#: lzl-product-codes.php:279
 msgid "Code was sended"
 msgstr "El Código fue eliminado"
 
-#: lrep-product-codes.php:293 lrep-product-codes.php:346
+#: lzl-product-codes.php:284 lzl-product-codes.php:337
 msgid "Product ID is empty"
 msgstr "El ID del producto es vacío"
 
-#: lrep-product-codes.php:297
+#: lzl-product-codes.php:288
 msgid "Invalid email"
 msgstr "Email inválido"
 
-#: lrep-product-codes.php:310
+#: lzl-product-codes.php:301
 msgid "The Subject email is empty"
 msgstr "El Asunto del email es vacío"
 
-#: lrep-product-codes.php:314
+#: lzl-product-codes.php:305
 msgid "The Body Message email is empty"
 msgstr "El cuerpo de mensaje del email es vacío"
 
-#: lrep-product-codes.php:320 lrep-product-codes.php:338
+#: lzl-product-codes.php:311 lzl-product-codes.php:329
 msgid "Error sending the email try again later"
 msgstr "Error enviando el email. Intente nuevamente más tarde"
 
-#: lrep-product-codes.php:341
+#: lzl-product-codes.php:332
 msgid "Email was sended"
 msgstr "El email fue enviado"
 
-#: lrep-product-codes.php:358 lrep-product-codes.php:482
-#: lrep-product-codes.php:483
+#: lzl-product-codes.php:349 lzl-product-codes.php:480
+#: lzl-product-codes.php:481
 msgid "Code"
 msgstr "Código"
 
-#: lrep-product-codes.php:359
+#: lzl-product-codes.php:350
 msgid "Status"
 msgstr "Estado"
 
-#: lrep-product-codes.php:369
+#: lzl-product-codes.php:360
 msgid "Delete"
 msgstr "Eliminar"
 
-#: lrep-product-codes.php:381
+#: lzl-product-codes.php:372
 msgid "Codes not found to this product."
 msgstr "Este producto no tiene códigos."
 
-#: lrep-product-codes.php:428
+#: lzl-product-codes.php:421
 msgid "Code is empty"
 msgstr "El Código es vacío"
 
-#: lrep-product-codes.php:432 lrep-product-codes.php:484
+#: lzl-product-codes.php:426
+msgid "Code is invalid. Type only letters or numbers."
+msgstr "El Código es inválido. Escribe únicamente letras o números."
+
+#: lzl-product-codes.php:430 lzl-product-codes.php:482
 msgid "Code exists"
 msgstr "El Código ya existe."
 
-#: lrep-product-codes.php:441
+#: lzl-product-codes.php:439
 msgid "Options Codes"
 msgstr "Códigos del Producto"
 
-#: lrep-product-codes.php:469
+#: lzl-product-codes.php:467
 msgid "See codes"
 msgstr "Ver los códigos"
 
-#: lrep-product-codes.php:472
+#: lzl-product-codes.php:470
 msgid "Subject email"
 msgstr "Asunto del email"
 
-#: lrep-product-codes.php:476
+#: lzl-product-codes.php:474
 msgid "Body Message email"
 msgstr "Cuerpo del mensaje del email"
 
-#: lrep-product-codes.php:484
+#: lzl-product-codes.php:482
 msgid "Add code"
 msgstr "Agregar código"
 
-#: lrep-product-codes.php:541
+#: lzl-product-codes.php:541
 msgid "WooCommerce plugin is required"
 msgstr "Debes instalar y activar el plugin WooCommercer primeramente."
 
