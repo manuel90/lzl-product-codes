@@ -28,7 +28,7 @@ class LZL_Product_Codes {
         
         add_action( 'save_post', array($this,'saveCodes') );
 
-        add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10, 2);
+        add_action( 'confirmation_payment_larep', array($this,'responsePayment'), 10);
         add_action( 'woocommerce_email_customer_details', array($this,'contentEmailProcessing'), 19, 4);
 
         //add_filter( 'report_str_product', array($this,'filterDataReportProduct'), 10, 3);
@@ -148,7 +148,7 @@ class LZL_Product_Codes {
         echo '<hr/><h3 style="font-size: 18px;line-height: 22px;">'.$subject.'</h3>'.$message.'<hr/><br/>';
     }
 
-    public function responsePayment($order,$request) {
+    public function responsePayment($order) {
 
         $items = $order->get_items();
 
