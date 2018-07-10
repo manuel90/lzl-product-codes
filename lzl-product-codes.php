@@ -392,7 +392,7 @@ class LZL_Product_Codes {
 
             $values = [];
             foreach($_POST['lzl_codes'] as $code) {
-                if( $this->exists( $code ) || !preg_match('/^([0-9]|[a-zA-Z])+$/',$code) ) {
+                if( $this->exists( $code ) || !preg_match('/^([^(\s)]+)$/',$code) ) {
                     continue;
                 }
                 $values[] = sprintf('(%d,"%s")',$post_id,$code);
@@ -427,7 +427,7 @@ class LZL_Product_Codes {
         }
         $code = trim($_POST['code']);
 
-        if( !preg_match('/^([0-9]|[a-zA-Z])+$/',$code) ) {
+        if( !preg_match('/^([^(\s)]+)$/',$code) ) {
             wp_send_json_error( __('Code is invalid. Type only letters or numbers.','lzl-product-codes') );
         }
         
